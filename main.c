@@ -21,21 +21,17 @@ int loop(InertialMeasurementSystem* system, long long* t) {
 
 int main() {
     InitializeSaveSystemWrite("data.txt");
-
-    quat rotation = {0, 0, 0, 1};
-    vec3 angularVelocity = {0, 0, 0};
-    vec3 angularAcceleration = {4 * 3.14, 0, 0};
-    InitilizeInertialMeasurementSystem(rotation, angularVelocity, angularAcceleration);
+    InitilizeInertialMeasurementSystem();
 
     int looping = 0;
     long long t = getTime();
     long long start = getTime();
     while (!looping) {
-        float size = qLen(ims.rotation);
-        float data[6] = {t - start, ims.rotation.x, ims.rotation.y, ims.rotation.z, ims.rotation.w, size};
-        SaveData(data, 6);
+        float size = qLength(ims.rotation);
+        float data[4] = {t - start, ims.position.x, ims.position.y, ims.position.z};
+        SaveData(data, 4);
         looping = loop(&ims, &t);
-        if (getTime() - start > 1000000000) looping = 1;
+        if (getTime() - start > 10000000000) looping = 1;
     }
 
     CloseSaveSystemWrite();
