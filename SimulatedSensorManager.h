@@ -57,4 +57,8 @@ float ReadPressure() {
 
 }
 
+vec3 ReadPosition() {
+    return location.position;
+}
+
 #endif
