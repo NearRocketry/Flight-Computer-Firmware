@@ -14,6 +14,11 @@ vec3 vInv(vec3 a) {
     return result;
 }
 
+vec3 vQuat(quat a) {
+    vec3 result = {a.x, a.y, a.z};
+    return result;
+}
+
 vec3 vAdd(vec3 const a, vec3 const b) {
     vec3 result = {a.x + b.x, a.y + b.y, a.z + b.z};
     return result;
