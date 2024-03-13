@@ -23,6 +23,7 @@ void InitilizeInertialMeasurementSystem() {
     InertialMeasurementSystem sys = {{1, 0, 0}, {0, 1, 0}, {-1, 0, 0}, {0, 0, 0, 1}, {0, 0, 0}, {0, 0, 0}};
     ims = sys;
     sensorTime = 0;
+    InitializeSensorManager();
 }
 
 void UpdateSystemEstimate(float deltaTime) {

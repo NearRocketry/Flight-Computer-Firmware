@@ -13,6 +13,14 @@ typedef struct {
 
 trajectoryLocation trajectory;
 
+vec3 PositionFunction(float time) {
+
+}
+
+quat RotationFunction(float time) {
+
+}
+
 void UpdateTrajectory(float time) {
     trajectory.position = PositionFunction(time);
     trajectory.velocity = vDivide(DELTA_TIME, vSubtract(PositionFunction(time + DELTA_TIME), PositionFunction(time)));
@@ -22,14 +30,6 @@ void UpdateTrajectory(float time) {
     quat rotationChange = qMultiply(RotationFunction(time + DELTA_TIME), qConjugate(RotationFunction(time)));
     float angle = acos(rotationChange.w);
     trajectory.angularVelocity = vScale(angle / sin(angle) / DELTA_TIME ,vQuat(rotationChange));
-}
-
-vec3 PositionFunction(float time) {
-
-}
-
-quat RotationFunction(float time) {
-
 }
 
 #endif

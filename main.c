@@ -20,8 +20,10 @@ int loop(InertialMeasurementSystem* system, long long* t) {
 }
 
 int main() {
+    srand(time(NULL));
     InitializeSaveSystemWrite("data.txt");
     InitilizeInertialMeasurementSystem();
+    printf("accelerometer bias %f %f %f", sensorData.accelerometerBias.x, sensorData.accelerometerBias.y, sensorData.accelerometerBias.z);
 
     int looping = 0;
     long long t = getTime();

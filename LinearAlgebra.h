@@ -3,11 +3,20 @@
 
 #include <math.h>
 
+#define PI 3.14159265359
+
 typedef struct {
     float x;
     float y;
     float z;
 } vec3;
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} quat;
 
 vec3 vInv(vec3 a) {
     vec3 result = {-a.x, -a.y, -a.z};
@@ -16,6 +25,11 @@ vec3 vInv(vec3 a) {
 
 vec3 vQuat(quat a) {
     vec3 result = {a.x, a.y, a.z};
+    return result;
+}
+
+vec3 vPolar(float a, float b, float c) {
+    vec3 result = {c * sin(a) * cos(b), c * sin(a) * sin(b), c * cos(a)};
     return result;
 }
 
@@ -56,13 +70,6 @@ vec3 vNormalize(vec3 const a) {
     if (vLength(a) == 0) return a;
     return vDivide(vLength(a), a);
 }
-
-typedef struct {
-    float x;
-    float y;
-    float z;
-    float w;
-} quat;
 
 quat qReal(float const a) {
     quat result = {0, 0, 0, a};
