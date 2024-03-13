@@ -38,13 +38,13 @@ float normalDestribution(float average, float standardDeviation, int iterations)
 vec3 randomVector(float averageMagnitude, float standardDeviation) {
     float mainAngle = acos(2 * (float) rand() / RAND_MAX - 1);
     float secondAngle = 2 * PI * rand() / RAND_MAX;
-    float magnitude = normalDestribution(averageMagnitude, standardDeviation / 3, 10);
+    float magnitude = normalDestribution(averageMagnitude, standardDeviation, 10);
     return vPolar(mainAngle, secondAngle, magnitude);
 }
 
 void InitializeSensorManager() {
-    sensorData.accelerometerBias = randomVector(0, ACCELEROMETER_BIAS / 3);
-    sensorData.gyroscopeBias = randomVector(0, GYROSCOPE_BIAS / 3);
+    sensorData.accelerometerBias = randomVector(0, ACCELEROMETER_BIAS);
+    sensorData.gyroscopeBias = randomVector(0, GYROSCOPE_BIAS);
 }
 
 void UpdateSensorData(float dt) {
@@ -53,18 +53,19 @@ void UpdateSensorData(float dt) {
 }
 
 vec3 ReadAcceleration() {
-    vec3 result = qRotateVector(trajectory.acceleration, trajectory.rotation);
-    result = qRotateVector(result, qPolar(randomVector(0, ACCELEROMETER_CROSS_AXIS / 3)));
+    vec3 gravity = {0, 0, 9.81};
+    vec3 result = vAdd(qRotateVector(trajectory.acceleration, trajectory.rotation), gravity);
+    result = qRotateVector(result, qPolar(randomVector(0, ACCELEROMETER_CROSS_AXIS)));
     result = vAdd(result, sensorData.accelerometerBias);
-    result = vAdd(result, randomVector(0, ACCELEROMETER_NOISE_RMS / 3));
+    result = vAdd(result, randomVector(0, ACCELEROMETER_NOISE_RMS));
     return result;
 }
 
 vec3 ReadAngularVelocity() {
     vec3 result = trajectory.angularVelocity;
-    result = qRotateVector(result, qPolar(randomVector(0, GYROSCOPE_CROSS_AXIS / 3)));
+    result = qRotateVector(result, qPolar(randomVector(0, GYROSCOPE_CROSS_AXIS)));
     result = vAdd(result, sensorData.gyroscopeBias);
-    result = vAdd(result, randomVector(0, GYROSCOPE_NOISE_RMS / 3));
+    result = vAdd(result, randomVector(0, GYROSCOPE_NOISE_RMS));
     return result;
 }
 

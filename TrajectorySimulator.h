@@ -14,11 +14,13 @@ typedef struct {
 trajectoryLocation trajectory;
 
 vec3 PositionFunction(float time) {
-
+    vec3 result = {0, 0, 0};
+    return result;
 }
 
 quat RotationFunction(float time) {
-
+    quat result = {1, 0, 0, 0};
+    return result;
 }
 
 void UpdateTrajectory(float time) {
