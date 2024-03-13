@@ -27,6 +27,12 @@ void InitilizeInertialMeasurementSystem() {
 
 void UpdateSystemEstimate(float deltaTime) {
     UpdateSensorData(deltaTime);
+
+    vec3 acceleration = ReadAcceleration(sensorTime);
+    vec3 angularVelocity = ReadAngularVelocity(sensorTime);
+
+    quat endRotation = qMultiply(qPolar(vScale(deltaTime, angularVelocity)), ims.rotation);
+    vec3 rotatedAcceleration = qRotateVector(acceleration, endRotation);
     
     ims.position = vAdd(ims.position, vScale(0.25 * deltaTime, ims.velocity));
     ims.velocity = vAdd(ims.velocity, vScale(0.5 * deltaTime, ims.acceleration));
