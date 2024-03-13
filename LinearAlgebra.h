@@ -18,6 +18,12 @@ typedef struct {
     float w;
 } quat;
 
+typedef struct {
+    vec3 a;
+    vec3 b;
+    vec3 c;
+} matrix;
+
 vec3 vInv(vec3 a) {
     vec3 result = {-a.x, -a.y, -a.z};
     return result;
@@ -152,6 +158,21 @@ vec3 qRotateVector(vec3 const a, quat const b) {
 
 quat qPolarRotation(vec3 const rotator, quat const rotation) {
 	return qMultiply(qPolar(rotator), rotation);
+}
+
+vec3 mApply(matrix const a, vec3 b) {
+    vec3 result = vAdd(vAdd(vScale(b.x, a.a), vScale(b.y, a.b)), vScale(b.z, a.c));
+    return result;
+}
+
+matrix mDioagonal(vec3 const a) {
+    matrix result = {{a.x, 0, 0}, {0, a.y, 0}, {0, a.z, 0}};
+    return result;
+}
+
+matrix mAdd(matrix const a, matrix const b) {
+    matrix result = {vAdd(a.a, b.a), vAdd(a.b, b.b), vAdd(a.c, b.c)};
+    return result;
 }
 
 #endif

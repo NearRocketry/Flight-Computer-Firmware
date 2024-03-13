@@ -19,7 +19,9 @@ float sensorTime;
 
 typedef struct {
     vec3 accelerometerBias;
+    matrix accelerometerCrossAxis;
     vec3 gyroscopeBias;
+    matrix gyroscopeCrossAxis;
 } sensorValues;
 
 sensorValues sensorData;
@@ -44,7 +46,17 @@ vec3 randomVector(float averageMagnitude, float standardDeviation) {
 
 void InitializeSensorManager() {
     sensorData.accelerometerBias = randomVector(0, ACCELEROMETER_BIAS);
+    matrix accelerometerCrossAxis = 
+    {{1 - pow(normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 2), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10)},
+    {normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 2), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10)},
+    {normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 2)}};
+    sensorData.accelerometerCrossAxis = accelerometerCrossAxis;
     sensorData.gyroscopeBias = randomVector(0, GYROSCOPE_BIAS);
+    matrix gyroscopeCrossAxis = 
+    {{1 - pow(normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 2), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10)},
+    {normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 2), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10)},
+    {normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 2)}};
+    sensorData.gyroscopeCrossAxis = gyroscopeCrossAxis;
 }
 
 void UpdateSensorData(float dt) {
@@ -53,9 +65,9 @@ void UpdateSensorData(float dt) {
 }
 
 vec3 ReadAcceleration() {
-    vec3 gravity = {0, 0, 9.81};
+    vec3 gravity = {0, 0, 0 * -9.81};
     vec3 result = vAdd(qRotateVector(trajectory.acceleration, trajectory.rotation), gravity);
-    result = qRotateVector(result, qPolar(randomVector(0, ACCELEROMETER_CROSS_AXIS)));
+    result = mApply(sensorData.accelerometerCrossAxis, result);
     result = vAdd(result, sensorData.accelerometerBias);
     result = vAdd(result, randomVector(0, ACCELEROMETER_NOISE_RMS));
     return result;
@@ -63,7 +75,7 @@ vec3 ReadAcceleration() {
 
 vec3 ReadAngularVelocity() {
     vec3 result = trajectory.angularVelocity;
-    result = qRotateVector(result, qPolar(randomVector(0, GYROSCOPE_CROSS_AXIS)));
+    result = mApply(sensorData.gyroscopeCrossAxis, result);
     result = vAdd(result, sensorData.gyroscopeBias);
     result = vAdd(result, randomVector(0, GYROSCOPE_NOISE_RMS));
     return result;
