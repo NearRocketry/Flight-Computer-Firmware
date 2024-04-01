@@ -29,8 +29,8 @@ void InitilizeInertialMeasurementSystem() {
 void UpdateSystemEstimate(float deltaTime) {
     UpdateSensorData(deltaTime);
 
-    vec3 acceleration = ReadAcceleration(sensorTime);
-    vec3 angularVelocity = ReadAngularVelocity(sensorTime);
+    vec3 acceleration = ReadAcceleration();
+    vec3 angularVelocity = ReadAngularVelocity();
 }
 
 #endif

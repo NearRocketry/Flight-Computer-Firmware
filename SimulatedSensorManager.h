@@ -15,6 +15,15 @@
 #define GYROSCOPE_NOISE_RMS 0.00288 // noise in radians per second
 #define GYROSCOPE_CROSS_AXIS 0.002
 
+#define BAROMETER_BIAS 33.3333
+#define BAROMETER_NOISE_RMS 2
+#define GROUND_PRESSURE_RMS 150
+#define NORMAL_GROUND_PRESSURE 101325
+#define PRESSURE_EXPONENT 3.50057556648
+#define TEMEPERATURE_LAPSE_RATE 0.00976
+#define GROUND_TEMPERATRURE 25
+#define GROUND_TEMEPERATURE_RMS 3
+
 float sensorTime;
 
 typedef struct {
@@ -22,6 +31,9 @@ typedef struct {
     matrix accelerometerCrossAxis;
     vec3 gyroscopeBias;
     matrix gyroscopeCrossAxis;
+    float barometerBias;
+    float groundPressure;
+    float groundTemperature;
 } sensorValues;
 
 sensorValues sensorData;
@@ -45,18 +57,24 @@ vec3 randomVector(float averageMagnitude, float standardDeviation) {
 }
 
 void InitializeSensorManager() {
+    // initialize the decalibration values for accelerometer
     sensorData.accelerometerBias = randomVector(0, ACCELEROMETER_BIAS);
     matrix accelerometerCrossAxis = 
     {{1 - pow(normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 2), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10)},
     {normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 2), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10)},
     {normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, ACCELEROMETER_CROSS_AXIS, 10), 2)}};
     sensorData.accelerometerCrossAxis = accelerometerCrossAxis;
+    // initialize the decalibration values for gyroscope
     sensorData.gyroscopeBias = randomVector(0, GYROSCOPE_BIAS);
     matrix gyroscopeCrossAxis = 
     {{1 - pow(normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 2), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10)},
     {normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 2), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10)},
     {normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 1 - pow(normalDestribution(0, GYROSCOPE_CROSS_AXIS, 10), 2)}};
     sensorData.gyroscopeCrossAxis = gyroscopeCrossAxis;
+    // initialize the decalibration values for barometer
+    sensorData.barometerBias = normalDestribution(0, BAROMETER_BIAS, 10);
+    sensorData.groundPressure = normalDestribution(NORMAL_GROUND_PRESSURE, GROUND_PRESSURE_RMS, 10);
+    sensorData.groundTemperature = normalDestribution(GROUND_TEMPERATRURE, GROUND_TEMEPERATURE_RMS, 10);
 }
 
 void UpdateSensorData(float dt) {
@@ -66,7 +84,7 @@ void UpdateSensorData(float dt) {
 
 vec3 ReadAcceleration() {
     vec3 gravity = {0, 0, 0 * -9.81};
-    vec3 result = vAdd(qRotateVector(trajectory.acceleration, trajectory.rotation), gravity);
+    vec3 result = qRotateVector(vAdd(trajectory.acceleration, gravity), trajectory.rotation);
     result = mApply(sensorData.accelerometerCrossAxis, result);
     result = vAdd(result, sensorData.accelerometerBias);
     result = vAdd(result, randomVector(0, ACCELEROMETER_NOISE_RMS));
@@ -90,7 +108,10 @@ float ReadTemperature() {
 }
 
 float ReadPressure() {
-
+    float height = trajectory.position.z;
+    float pressure = sensorData.groundPressure * powf(1 - height * TEMEPERATURE_LAPSE_RATE / sensorData.groundTemperature, PRESSURE_EXPONENT);
+    pressure += sensorData.barometerBias + normalDestribution(0, BAROMETER_NOISE_RMS, 10);
+    return pressure;
 }
 
 vec3 ReadPosition() {
