@@ -2,6 +2,7 @@
     "files.associations": {
         "chrono": "cpp",
         "functional": "cpp",
-        "time.h": "c"
+        "time.h": "c",
+        "linearalgebra.h": "c"
     }
 }
