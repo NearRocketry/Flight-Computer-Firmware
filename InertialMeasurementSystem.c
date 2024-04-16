@@ -1,4 +1,4 @@
-#include "SimulatedInertialMeasurementSystem.h"
+#include "InertialMeasurementSystem.h"
 
 void RotateInTime(float deltaTime) {
     vec3 rotationVector = vScale(deltaTime, ims.angularVelocity);
