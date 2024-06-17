@@ -1,0 +1,10 @@
+../Core/Src/SimulatedSensorManager.c:6:7:normalDestribution	2
+../Core/Src/SimulatedSensorManager.c:17:6:randomVector	1
+../Core/Src/SimulatedSensorManager.c:24:6:InitializeSensorManager	1
+../Core/Src/SimulatedSensorManager.c:46:6:UpdateSensorData	1
+../Core/Src/SimulatedSensorManager.c:51:6:ReadAcceleration	1
+../Core/Src/SimulatedSensorManager.c:60:6:ReadAngularVelocity	1
+../Core/Src/SimulatedSensorManager.c:68:6:ReadMagneticField	1
+../Core/Src/SimulatedSensorManager.c:73:7:ReadTemperature	1
+../Core/Src/SimulatedSensorManager.c:77:7:ReadPressure	1
+../Core/Src/SimulatedSensorManager.c:84:6:ReadPosition	1

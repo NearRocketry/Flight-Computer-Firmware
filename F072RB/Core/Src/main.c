@@ -57,6 +57,83 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void UARTSendString(char* message, uint8_t length){
+	if (HAL_UART_Transmit(&huart2, (uint8_t*)message, length, 100) != HAL_OK) {
+
+	}
+}
+
+void UARTSendInt(int number) {
+	if (number < 0) {
+	    UARTSendString("-", 1);
+	    number = -number;
+	}
+
+	int num_digits = 0;
+	int temp = number;
+
+	  // Count the number of digits (works for non-negative numbers)
+	while (temp > 0) {
+	    temp /= 10;
+	    num_digits++;
+	}
+
+	char* buffer = (char*)malloc(num_digits * sizeof(char));
+
+	  // Handle zero (special case)
+	if (number == 0) {
+	    UARTSendString("0", 1);
+	    return;
+	}
+
+	  // Fill the buffer with digits (right-to-left conversion)
+	for (int i = num_digits - 1; i >= 0; i--) {
+	    int digit = number % 10;
+	    buffer[i] = 0x30 + digit;
+	    number /= 10;
+	}
+	UARTSendString(buffer, (uint8_t)num_digits);
+}
+
+void UARTSendFloat(float number, int accuracy){
+	if (number < 0) {
+	    UARTSendString("-", 1);
+	    number = -number;
+	}
+
+	if (isnan(number)) {
+		UARTSendString("NaN", 3);
+		return;
+	}
+
+	if (isinf(number)) {
+		UARTSendString("Inf", 3);
+	}
+
+	int exponent = (int)floor(log10(number));
+	int mantissaLeading = (int)(number * pow(10, -exponent));
+	int mantissaRest = (int)((number * pow(10, -exponent) - mantissaLeading) * pow(10, accuracy));
+	UARTSendInt(mantissaLeading);
+	UARTSendString(".", 2);
+	UARTSendInt(mantissaRest);
+	UARTSendString("E", 1);
+	UARTSendInt(exponent);
+}
+
+uint32_t GetTime()
+{
+    uint32_t ms = HAL_GetTick();
+    uint32_t st = SysTick->VAL;
+
+    if (ms != HAL_GetTick())
+    {
+        ms = HAL_GetTick();
+        st = SysTick->VAL;
+    }
+
+    return ms * 1000 - st / ((SysTick->LOAD + 1) / 1000);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -77,6 +154,11 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  int startTime = GetTime();
+  int lastTime = startTime;
+  int count = 100;
+  InitilizeInertialMeasurementSystem();
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -91,14 +173,22 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  UARTSendString("\r\n\r\n", 4);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+  while (count > 0)
   {
     /* USER CODE END WHILE */
-
+	count -= 1;
+	int time = GetTime();
+	int deltaTime = time - lastTime;
+	UpdateSystemEstimate(1E-6 * deltaTime);
+	UARTSendFloat(GetEstimate().acceleration.z, 5);
+	UARTSendString("\r\n", 2);
+	lastTime = time;
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

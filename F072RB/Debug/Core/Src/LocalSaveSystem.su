@@ -1,0 +1,4 @@
+../Core/Src/LocalSaveSystem.c:3:6:InitializeSaveSystemWrite	16	static
+../Core/Src/LocalSaveSystem.c:12:6:SaveData	32	static
+../Core/Src/LocalSaveSystem.c:20:6:CloseSaveSystemWrite	8	static
+../Core/Src/LocalSaveSystem.c:24:6:GraphSaveData	8	static

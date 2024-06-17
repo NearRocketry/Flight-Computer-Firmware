@@ -1,0 +1,4 @@
+../Core/Src/TrajectorySimulator.c:5:6:PositionFunction	40	static
+../Core/Src/TrajectorySimulator.c:10:6:RotationFunction	40	static
+../Core/Src/TrajectorySimulator.c:15:6:UpdateTrajectory	264	static
+../Core/Src/TrajectorySimulator.c:26:20:GetTrajectory	16	static
